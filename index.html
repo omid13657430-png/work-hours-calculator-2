@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -7,66 +8,49 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *{box-sizing:border-box}
-body{font-family:Tahoma,Arial,sans-serif;background:#f3f5f8;color:#202938;margin:0;padding:16px}
+body{font-family:Tahoma,Arial;background:#f2f5f9;color:#263445;margin:0;padding:15px}
 main{max-width:850px;margin:auto}
-h1{font-size:23px;text-align:center}
-.card{background:white;padding:17px;border-radius:14px;margin:14px 0;box-shadow:0 2px 9px #0000000c}
-p{line-height:1.9}
-label{display:block;margin:10px 0 6px}
-input,select,button{font:inherit}
-input[type="text"],input[type="time"],input[type="file"]{width:100%;padding:11px;border:1px solid #ccd3dd;border-radius:8px;background:white}
-button{border:0;border-radius:9px;padding:12px 16px;background:#1769d2;color:white;cursor:pointer;margin:5px 2px}
-button.secondary{background:#64748b}
-button.danger{background:#c0392b}
-button:disabled{opacity:.5;cursor:wait}
-.modes{display:flex;gap:12px;flex-wrap:wrap}
-.mode{background:#f1f5f9;padding:12px;border-radius:9px;flex:1;min-width:180px}
-table{width:100%;border-collapse:collapse;margin-top:12px;min-width:480px}
-th,td{border:1px solid #dce2e9;padding:8px;text-align:center}
-th{background:#eef3f9}
-td input{min-width:90px}
-.table-wrap{overflow-x:auto}
-.result{font-size:20px;font-weight:bold;color:#12613b}
-#status{white-space:pre-wrap;line-height:1.8;color:#334155}
-.hint{font-size:13px;color:#64748b}
+h2{text-align:center}
+.card{background:white;padding:16px;border-radius:12px;margin:15px 0;box-shadow:0 2px 8px #0001}
+p{line-height:1.8}
+button{background:#1769d2;color:white;border:0;border-radius:8px;padding:12px;margin:5px;cursor:pointer;font:inherit}
+button:disabled{opacity:.5}
+input{font:inherit;padding:10px;border:1px solid #ccd3dd;border-radius:7px}
+input[type=file]{width:100%}
+input[type=time]{width:125px}
+table{width:100%;border-collapse:collapse;min-width:390px}
+th,td{border:1px solid #ddd;padding:8px;text-align:center}
+th{background:#edf2f8}
+.wrap{overflow-x:auto}
+.result{font-size:20px;font-weight:bold;color:#087443;margin-top:16px}
+.status{line-height:2;color:#475569;white-space:pre-wrap}
+.delete{background:#c0392b;padding:8px}
+.small{font-size:12px;color:#64748b}
 </style>
 </head>
 <body>
 <main>
-<h1>محاسبه ساعات کارکرد کارکنان</h1>
 
-<section class="card">
-<h3>۱. بارگذاری عکس جدول</h3>
-<p>عکس جدول حضور و غیاب را انتخاب کن. برنامه تلاش می‌کند ساعت ورود و خروج را از روی آن بخواند.</p>
+<h2>محاسبه ساعات کارکرد کارکنان</h2>
+
+<div class="card">
+<h3>۱. انتخاب عکس برگه</h3>
 <input type="file" id="photo" accept="image/*">
-<button id="readBtn" onclick="readPhoto()">خواندن ساعت‌ها از عکس</button>
-<p id="status" class="hint">هنوز عکسی انتخاب نشده است.</p>
-<p class="hint">تشخیص از روی عکس ممکن است اشتباه باشد؛ ساعت‌ها را در جدول پایین بررسی و در صورت نیاز اصلاح کن.</p>
-</section>
-
-<section class="card">
-<h3>۲. انتخاب بازه محاسبه</h3>
-<div class="modes">
-<label class="mode">
-<input type="radio" name="mode" value="morning" checked>
-<strong>از ساعت ۸ تا ۱۳</strong>
-</label>
-<label class="mode">
-<input type="radio" name="mode" value="afternoon">
-<strong>از ساعت ۱۳ تا خروج</strong>
-</label>
+<button id="readBtn" onclick="readPhoto()">تشخیص ساعت‌ها از عکس</button>
+<div id="status" class="status">عکس برگه حضور و غیاب را انتخاب کن.</div>
+<p class="small">عکس باید کامل، صاف و خوانا باشد. برای تشخیص صحیح، همه ردیف‌های جدول در تصویر دیده شوند.</p>
 </div>
-</section>
 
-<section class="card">
-<h3>۳. اطلاعات کارکنان</h3>
-<div class="table-wrap">
+<div class="card">
+<h3>۲. ساعت‌های استخراج‌شده</h3>
+<p>ساعت ورود و خروج هر ردیف را بررسی کن. در صورت اشتباه بودن می‌توانی آن را اصلاح کنی.</p>
+<div class="wrap">
 <table>
 <thead>
 <tr>
-<th>نام</th>
-<th>ساعت ورود</th>
-<th>ساعت خروج</th>
+<th>ردیف</th>
+<th>ورود</th>
+<th>خروج</th>
 <th>کارکرد</th>
 <th>حذف</th>
 </tr>
@@ -74,149 +58,259 @@ td input{min-width:90px}
 <tbody id="rows"></tbody>
 </table>
 </div>
-<button class="secondary" onclick="addRow()">افزودن نفر</button>
-<button onclick="calculate()">محاسبه کارکرد</button>
-<div id="total" class="result"></div>
-</section>
+<button onclick="addRow()">افزودن ردیف</button>
+<button onclick="calculate()">محاسبه مجموع</button>
+<div id="total" class="result">مجموع کارکرد: ۰ ساعت و ۰ دقیقه</div>
+</div>
+
 </main>
 
 <script>
-const rows = document.getElementById('rows');
+const tbody=document.getElementById('rows');
 
-function normalizeDigits(value){
-  const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
-  return String(value).replace(/[۰-۹]/g,d=>fa.indexOf(d))
-    .replace(/[٠-٩]/g,d=>ar.indexOf(d))
-    .replace(/[٫.]/g,':');
+function normalize(s){
+const fa='۰۱۲۳۴۵۶۷۸۹';
+const ar='٠١٢٣٤٥٦٧٨٩';
+return String(s)
+.replace(/[۰-۹]/g,x=>fa.indexOf(x))
+.replace(/[٠-٩]/g,x=>ar.indexOf(x))
+.replace(/[：؛]/g,':')
+.replace(/[٫،]/g,':')
+.replace(/[.\/\\]/g,':')
+.replace(/\s/g,'');
 }
 
-function addRow(name='', entry='', exit=''){
-  const tr=document.createElement('tr');
-  tr.innerHTML=`
-    <td><input type="text" placeholder="نام" value="${escapeHtml(name)}"></td>
-    <td><input type="time" value="${entry}"></td>
-    <td><input type="time" value="${exit}"></td>
-    <td class="worked">—</td>
-    <td><button class="danger" onclick="this.closest('tr').remove();calculate()">حذف</button></td>`;
-  rows.appendChild(tr);
+function getMinutes(t){
+if(!t)return null;
+let p=t.split(':');
+if(p.length!==2)return null;
+let h=Number(p[0]),m=Number(p[1]);
+if(!Number.isInteger(h)||!Number.isInteger(m))return null;
+if(h<0||h>23||m<0||m>59)return null;
+return h*60+m;
 }
 
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g,c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
+function extractTimes(text){
+text=normalize(text);
+let matches=[...text.matchAll(/(?:^|[^\d])(\d{1,2})[:](\d{2})(?!\d)/g)];
+let result=[];
+for(let m of matches){
+let t=String(m[1]).padStart(2,'0')+':'+m[2];
+if(getMinutes(t)!==null)result.push(t);
+}
+return result;
 }
 
-function toMinutes(t){
-  if(!t || !t.includes(':')) return null;
-  const [h,m]=t.split(':').map(Number);
-  if(!Number.isFinite(h)||!Number.isFinite(m)||h>23||m>59) return null;
-  return h*60+m;
+function addRow(entry='',exit=''){
+const tr=document.createElement('tr');
+tr.innerHTML=`
+<td>${tbody.children.length+1}</td>
+<td><input type="time" class="entry" value="${entry}"></td>
+<td><input type="time" class="exit" value="${exit}"></td>
+<td class="worked">-</td>
+<td><button class="delete" onclick="removeRow(this)">حذف</button></td>
+`;
+tbody.appendChild(tr);
 }
 
-function durationText(minutes){
-  return Math.floor(minutes/60)+' ساعت و '+(minutes%60)+' دقیقه';
+function removeRow(btn){
+btn.closest('tr').remove();
+renumber();
+calculate();
+}
+
+function renumber(){
+[...tbody.children].forEach((tr,i)=>{
+tr.cells[0].textContent=i+1;
+});
+}
+
+function format(n){
+return Math.floor(n/60)+' ساعت و '+(n%60)+' دقیقه';
 }
 
 function calculate(){
-  const mode=document.querySelector('input[name="mode"]:checked').value;
-  let total=0, valid=0;
+let sum=0,count=0;
 
-  [...rows.children].forEach(tr=>{
-    const inputs=tr.querySelectorAll('input');
-    const entry=toMinutes(inputs[1].value);
-    const exit=toMinutes(inputs[2].value);
-    const cell=tr.querySelector('.worked');
+[...tbody.children].forEach(tr=>{
+let entry=getMinutes(tr.querySelector('.entry').value);
+let exit=getMinutes(tr.querySelector('.exit').value);
+let cell=tr.querySelector('.worked');
 
-    if(entry===null || exit===null || exit<entry){
-      cell.textContent='ساعت نامعتبر';
-      return;
-    }
+if(entry===null||exit===null||exit<entry){
+cell.textContent='بررسی شود';
+return;
+}
 
-    let minutes=0;
-    if(mode==='morning'){
-      minutes=Math.max(0,Math.min(exit,780)-Math.max(entry,480));
-    }else{
-      minutes=Math.max(0,exit-Math.max(entry,780));
-    }
+let start=Math.max(entry,13*60);
+let work=Math.max(0,exit-start);
 
-    cell.textContent=durationText(minutes);
-    total+=minutes;
-    valid++;
-  });
+cell.textContent=format(work);
+sum+=work;
+count++;
+});
 
-  document.getElementById('total').textContent=
-    'جمع کل ('+valid+' نفر): '+durationText(total);
+document.getElementById('total').textContent=
+'مجموع کارکرد '+count+' ردیف: '+format(sum);
+}
+
+function groupWords(words){
+let groups=[];
+
+for(const w of words){
+if(!w.text||!w.bbox)continue;
+
+let y=(w.bbox.y0+w.bbox.y1)/2;
+let height=w.bbox.y1-w.bbox.y0;
+let group=groups.find(g=>
+Math.abs(g.y-y)<Math.max(12,Math.min(24,g.height*.65))
+);
+
+if(!group){
+groups.push({y:y,height:height,words:[w]});
+}else{
+group.words.push(w);
+group.y=group.words.reduce((s,a)=>s+(a.bbox.y0+a.bbox.y1)/2,0)/group.words.length;
+group.height=Math.max(group.height,height);
+}
+}
+
+return groups.sort((a,b)=>a.y-b.y);
+}
+
+function timesInLine(words){
+let line=[...words].sort((a,b)=>a.bbox.x0-b.bbox.x0);
+let found=[];
+
+for(const w of line){
+for(const t of extractTimes(w.text)){
+found.push({time:t,x:w.bbox.x0});
+}
+}
+
+// اگر OCR ساعت و دقیقه را جدا خوانده باشد، آن‌ها را به هم وصل می‌کنیم.
+for(let i=0;i<line.length-1;i++){
+let a=line[i],b=line[i+1];
+let distance=b.bbox.x0-a.bbox.x1;
+
+if(distance>=0&&distance<45){
+let joined=normalize(a.text)+':'+normalize(b.text);
+for(const t of extractTimes(joined)){
+found.push({time:t,x:(a.bbox.x0+b.bbox.x0)/2});
+}
+}
+}
+
+let unique=[];
+found.forEach(t=>{
+if(!unique.some(x=>x.time===t.time&&Math.abs(x.x-t.x)<20)){
+unique.push(t);
+}
+});
+
+// ترتیب زمانی، نه ترتیب چپ و راست ستون‌های جدول
+unique.sort((a,b)=>getMinutes(a.time)-getMinutes(b.time));
+return unique.map(x=>x.time);
+}
+
+async function prepareImage(file){
+const bitmap=await createImageBitmap(file);
+const scale=Math.min(2.5,2200/bitmap.width);
+
+const canvas=document.createElement('canvas');
+canvas.width=Math.round(bitmap.width*scale);
+canvas.height=Math.round(bitmap.height*scale);
+
+const ctx=canvas.getContext('2d',{willReadFrequently:true});
+ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+
+const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+
+for(let i=0;i<img.data.length;i+=4){
+let gray=.299*img.data[i]+.587*img.data[i+1]+.114*img.data[i+2];
+let v=Math.max(0,Math.min(255,(gray-128)*1.4+128));
+img.data[i]=v;
+img.data[i+1]=v;
+img.data[i+2]=v;
+}
+
+ctx.putImageData(img,0,0);
+return canvas;
 }
 
 async function readPhoto(){
-  const file=document.getElementById('photo').files[0];
-  const status=document.getElementById('status');
-  const btn=document.getElementById('readBtn');
+const file=document.getElementById('photo').files[0];
+const status=document.getElementById('status');
+const btn=document.getElementById('readBtn');
 
-  if(!file){
-    status.textContent='اول عکس جدول را انتخاب کن.';
-    return;
-  }
-  if(!window.Tesseract){
-    status.textContent='ابزار خواندن عکس بارگذاری نشد. اینترنت را بررسی و صفحه را دوباره باز کن.';
-    return;
-  }
+if(!file){
+status.textContent='ابتدا عکس را انتخاب کن.';
+return;
+}
 
-  btn.disabled=true;
-  status.textContent='در حال خواندن عکس؛ لطفاً صبر کن...';
+if(!window.Tesseract){
+status.textContent='ابزار تشخیص عکس بارگذاری نشده است. اینترنت را بررسی کن.';
+return;
+}
 
-  let worker;
-  try{
-    worker=await Tesseract.createWorker('fas+eng',1,{
-      logger:m=>{
-        if(m.status==='recognizing text'){
-          status.textContent='در حال تشخیص نوشته‌ها: '+Math.round((m.progress||0)*100)+'٪';
-        }else{
-          status.textContent='در حال آماده‌سازی ابزار خواندن عکس...';
-        }
-      }
-    });
+btn.disabled=true;
+status.textContent='در حال آماده‌سازی عکس...';
 
-    const result=await worker.recognize(file);
-    const text=normalizeDigits(result.data.text);
-    const lines=text.split(/\n/).map(x=>x.trim()).filter(Boolean);
-    const timeRegex=/\b(?:[01]?\d|2[0-3]):[0-5]\d\b/g;
-    const found=[];
+let worker=null;
 
-    for(const line of lines){
-      const times=line.match(timeRegex)||[];
-      if(times.length>=2){
-        const name=line.replace(timeRegex,' ').replace(/\s+/g,' ').trim();
-        found.push({name:name||'کارمند '+(found.length+1),entry:times[0],exit:times[1]});
-      }
-    }
+try{
+const image=await prepareImage(file);
 
-    if(found.length===0){
-      const all=text.match(timeRegex)||[];
-      for(let i=0;i+1<all.length;i+=2){
-        found.push({
-          name:'کارمند '+(found.length+1),
-          entry:all[i],
-          exit:all[i+1]
-        });
-      }
-    }
+worker=await Tesseract.createWorker('fas+eng',1,{
+logger:m=>{
+if(m.status==='recognizing text'){
+status.textContent='در حال خواندن عکس: '+Math.round((m.progress||0)*100)+'٪';
+}
+}
+});
 
-    if(found.length===0){
-      status.textContent='ساعتی از عکس تشخیص داده نشد. می‌توانی اطلاعات را دستی در جدول وارد کنی.';
-    }else{
-      rows.innerHTML='';
-      found.forEach(x=>addRow(x.name,x.entry,x.exit));
-      status.textContent=found.length+' ردیف احتمالی خوانده شد. لطفاً ساعت‌ها و نام‌ها را بررسی و اصلاح کن.';
-      calculate();
-    }
-  }catch(e){
-    status.textContent='خواندن عکس ناموفق بود. اتصال اینترنت را بررسی کن یا ساعت‌ها را دستی وارد کن.';
-  }finally{
-    if(worker) await worker.terminate();
-    btn.disabled=false;
-  }
+const result=await worker.recognize(image);
+const words=result.data.words||[];
+const groups=groupWords(words);
+
+let records=[];
+
+for(const group of groups){
+let times=timesInLine(group.words);
+
+if(times.length>=2){
+records.push({
+entry:times[0],
+exit:times[times.length-1]
+});
+}
+}
+
+if(records.length===0){
+status.textContent='هیچ ردیف دارای دو ساعت شناسایی نشد. لطفاً عکس واضح‌تر انتخاب کن یا ساعت‌ها را دستی وارد کن.';
+}else{
+tbody.innerHTML='';
+
+records.forEach(r=>{
+addRow(r.entry,r.exit);
+});
+
+calculate();
+
+status.textContent=
+records.length+' ردیف شناسایی شد و به جدول منتقل شد.\n'+
+'لطفاً ساعت‌ها را با عکس اصلی مقایسه کن؛ تشخیص خودکار ممکن است اشتباه داشته باشد.';
+}
+
+}catch(error){
+console.error(error);
+status.textContent='خطا در خواندن عکس. اینترنت را بررسی کن و دوباره تلاش کن.';
+}finally{
+if(worker){
+await worker.terminate();
+}
+btn.disabled=false;
+}
 }
 
 addRow();
