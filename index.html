@@ -4,316 +4,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>محاسبه ساعات کارکرد</title>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<title>محاسبه ساعت کارکرد</title>
 <style>
 *{box-sizing:border-box}
-body{font-family:Tahoma,Arial;background:#f2f5f9;color:#263445;margin:0;padding:15px}
-main{max-width:850px;margin:auto}
-h2{text-align:center}
-.card{background:white;padding:16px;border-radius:12px;margin:15px 0;box-shadow:0 2px 8px #0001}
-p{line-height:1.8}
-button{background:#1769d2;color:white;border:0;border-radius:8px;padding:12px;margin:5px;cursor:pointer;font:inherit}
-button:disabled{opacity:.5}
-input{font:inherit;padding:10px;border:1px solid #ccd3dd;border-radius:7px}
-input[type=file]{width:100%}
-input[type=time]{width:125px}
-table{width:100%;border-collapse:collapse;min-width:390px}
-th,td{border:1px solid #ddd;padding:8px;text-align:center}
-th{background:#edf2f8}
-.wrap{overflow-x:auto}
-.result{font-size:20px;font-weight:bold;color:#087443;margin-top:16px}
-.status{line-height:2;color:#475569;white-space:pre-wrap}
-.delete{background:#c0392b;padding:8px}
-.small{font-size:12px;color:#64748b}
+body{font-family:Tahoma,Arial;background:#f3f5f8;margin:0;padding:15px;color:#222}
+main{max-width:700px;margin:auto;background:white;padding:16px;border-radius:12px;box-shadow:0 2px 12px #0001}
+h2{text-align:center;font-size:21px}
+.guide{background:#eef5ff;padding:12px;border-radius:8px;line-height:2;font-size:13px;margin-bottom:15px}
+.total{background:#e8f6ed;border-radius:10px;padding:15px;text-align:center;margin:15px 0}
+.total strong{display:block;font-size:25px;margin-top:7px;color:#176b35}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:330px}
+th,td{border:1px solid #ddd;padding:8px 5px;text-align:center}
+th{background:#f0f2f5;font-size:13px}
+td{font-size:13px}
+input{width:78px;padding:9px 3px;border:1px solid #bbb;border-radius:6px;text-align:center;font-size:16px;direction:ltr;background:white}
+input:focus{outline:2px solid #6aa4e8;border-color:#4285d4}
+.duration{font-weight:bold;white-space:nowrap}
+.buttons{display:flex;gap:8px;margin-top:15px;flex-wrap:wrap}
+button{border:0;border-radius:7px;padding:11px 14px;font-size:14px;cursor:pointer;flex:1}
+.add{background:#246fc1;color:white}
+.clear{background:#e8e8e8;color:#222}
+.hint{color:#666;font-size:12px;line-height:1.8;margin-top:12px}
 </style>
 </head>
 <body>
 <main>
+<h2>ماشین حساب ساعت کارکرد</h2>
 
-<h2>محاسبه ساعات کارکرد کارکنان</h2>
-
-<div class="card">
-<h3>۱. انتخاب عکس برگه</h3>
-<input type="file" id="photo" accept="image/*">
-<button id="readBtn" onclick="readPhoto()">تشخیص ساعت‌ها از عکس</button>
-<div id="status" class="status">عکس برگه حضور و غیاب را انتخاب کن.</div>
-<p class="small">عکس باید کامل، صاف و خوانا باشد. برای تشخیص صحیح، همه ردیف‌های جدول در تصویر دیده شوند.</p>
+<div class="guide">
+ساعت ورود و خروج را وارد کن. ساعت را بدون دونقطه بنویس:
+<br>۱۳۴۴ ← ۱۳:۴۴
+<br>۱۴۰۵ ← ۱۴:۰۵
+<br>۷۳۰ ← ۰۷:۳۰
+<br>اگر فقط ۱۳ وارد کنی، بعد از خروج از کادر به ۱۳:۰۰ تبدیل می‌شود.
+<br>کارکرد قبل از ساعت ۱۳ محاسبه نمی‌شود.
 </div>
 
-<div class="card">
-<h3>۲. ساعت‌های استخراج‌شده</h3>
-<p>ساعت ورود و خروج هر ردیف را بررسی کن. در صورت اشتباه بودن می‌توانی آن را اصلاح کنی.</p>
-<div class="wrap">
+<div class="total">
+جمع کل ساعت کارکرد
+<strong id="grandTotal">۰ ساعت و ۰۰ دقیقه</strong>
+</div>
+
+<div class="table-wrap">
 <table>
 <thead>
 <tr>
 <th>ردیف</th>
-<th>ورود</th>
-<th>خروج</th>
+<th>ساعت ورود</th>
+<th>ساعت خروج</th>
 <th>کارکرد</th>
-<th>حذف</th>
 </tr>
 </thead>
 <tbody id="rows"></tbody>
 </table>
 </div>
-<button onclick="addRow()">افزودن ردیف</button>
-<button onclick="calculate()">محاسبه مجموع</button>
-<div id="total" class="result">مجموع کارکرد: ۰ ساعت و ۰ دقیقه</div>
+
+<div class="buttons">
+<button class="add" type="button" id="addButton">افزودن ۱۰ ردیف</button>
+<button class="clear" type="button" id="clearButton">پاک کردن همه</button>
 </div>
 
+<div class="hint">
+ساعت‌ها باید مربوط به یک روز باشند. اگر ساعت خروج زودتر از ساعت ورود باشد، آن ردیف محاسبه نمی‌شود.
+</div>
 </main>
 
 <script>
-const tbody=document.getElementById('rows');
+const tbody=document.getElementById("rows");
+const grandTotal=document.getElementById("grandTotal");
 
-function normalize(s){
-const fa='۰۱۲۳۴۵۶۷۸۹';
-const ar='٠١٢٣٤٥٦٧٨٩';
-return String(s)
-.replace(/[۰-۹]/g,x=>fa.indexOf(x))
-.replace(/[٠-٩]/g,x=>ar.indexOf(x))
-.replace(/[：؛]/g,':')
-.replace(/[٫،]/g,':')
-.replace(/[.\/\\]/g,':')
-.replace(/\s/g,'');
+function toEnglishDigits(value){
+return String(value)
+.replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+.replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d));
 }
 
-function getMinutes(t){
-if(!t)return null;
-let p=t.split(':');
-if(p.length!==2)return null;
-let h=Number(p[0]),m=Number(p[1]);
-if(!Number.isInteger(h)||!Number.isInteger(m))return null;
-if(h<0||h>23||m<0||m>59)return null;
-return h*60+m;
+function toPersianDigits(value){
+return String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 }
 
-function extractTimes(text){
-text=normalize(text);
-let matches=[...text.matchAll(/(?:^|[^\d])(\d{1,2})[:](\d{2})(?!\d)/g)];
-let result=[];
-for(let m of matches){
-let t=String(m[1]).padStart(2,'0')+':'+m[2];
-if(getMinutes(t)!==null)result.push(t);
+function parseTime(value){
+let s=toEnglishDigits(value).trim();
+if(!s)return null;
+
+let hour,minute;
+
+if(s.includes(":")){
+const parts=s.split(":");
+if(parts.length!==2||!/^\d+$/.test(parts[0])||!/^\d+$/.test(parts[1]))return null;
+hour=Number(parts[0]);
+minute=Number(parts[1]);
+}else{
+s=s.replace(/\D/g,"");
+if(s.length===1||s.length===2){
+hour=Number(s);
+minute=0;
+}else if(s.length===3){
+hour=Number(s.slice(0,1));
+minute=Number(s.slice(1));
+}else if(s.length===4){
+hour=Number(s.slice(0,2));
+minute=Number(s.slice(2));
+}else{
+return null;
 }
-return result;
 }
 
-function addRow(entry='',exit=''){
-const tr=document.createElement('tr');
-tr.innerHTML=`
-<td>${tbody.children.length+1}</td>
-<td><input type="time" class="entry" value="${entry}"></td>
-<td><input type="time" class="exit" value="${exit}"></td>
-<td class="worked">-</td>
-<td><button class="delete" onclick="removeRow(this)">حذف</button></td>
+if(hour<0||hour>23||minute<0||minute>59)return null;
+return hour*60+minute;
+}
+
+function formatInputTime(minutes){
+const hour=Math.floor(minutes/60);
+const minute=minutes%60;
+return toPersianDigits(
+String(hour).padStart(2,"0")+":"+
+String(minute).padStart(2,"0")
+);
+}
+
+function formatDuration(minutes){
+const hours=Math.floor(minutes/60);
+const mins=minutes%60;
+return toPersianDigits(
+hours+" ساعت و "+String(mins).padStart(2,"0")+" دقیقه"
+);
+}
+
+function addRows(count){
+const currentCount=tbody.querySelectorAll("tr").length;
+
+for(let i=0;i<count;i++){
+const row=document.createElement("tr");
+row.innerHTML=`
+<td>${toPersianDigits(currentCount+i+1)}</td>
+<td><input type="text" class="entry" inputmode="numeric" maxlength="5" placeholder="مثلاً ۱۳۰۰" aria-label="ساعت ورود"></td>
+<td><input type="text" class="exit" inputmode="numeric" maxlength="5" placeholder="مثلاً ۱۷۰۰" aria-label="ساعت خروج"></td>
+<td class="duration">—</td>
 `;
-tbody.appendChild(tr);
+tbody.appendChild(row);
 }
-
-function removeRow(btn){
-btn.closest('tr').remove();
-renumber();
-calculate();
-}
-
-function renumber(){
-[...tbody.children].forEach((tr,i)=>{
-tr.cells[0].textContent=i+1;
-});
-}
-
-function format(n){
-return Math.floor(n/60)+' ساعت و '+(n%60)+' دقیقه';
 }
 
 function calculate(){
-let sum=0,count=0;
+let total=0;
 
-[...tbody.children].forEach(tr=>{
-let entry=getMinutes(tr.querySelector('.entry').value);
-let exit=getMinutes(tr.querySelector('.exit').value);
-let cell=tr.querySelector('.worked');
+tbody.querySelectorAll("tr").forEach(row=>{
+const entryInput=row.querySelector(".entry");
+const exitInput=row.querySelector(".exit");
+const result=row.querySelector(".duration");
 
-if(entry===null||exit===null||exit<entry){
-cell.textContent='بررسی شود';
+const entry=parseTime(entryInput.value);
+const exit=parseTime(exitInput.value);
+
+if(entry===null||exit===null||!entryInput.value.trim()||!exitInput.value.trim()||exit<entry){
+result.textContent="—";
 return;
 }
 
-let start=Math.max(entry,13*60);
-let work=Math.max(0,exit-start);
+const start=Math.max(entry,13*60);
+const duration=Math.max(0,exit-start);
 
-cell.textContent=format(work);
-sum+=work;
-count++;
+result.textContent=formatDuration(duration);
+total+=duration;
 });
 
-document.getElementById('total').textContent=
-'مجموع کارکرد '+count+' ردیف: '+format(sum);
+grandTotal.textContent=formatDuration(total);
 }
 
-function groupWords(words){
-let groups=[];
+function normalizeInput(input,onBlur=false){
+let raw=toEnglishDigits(input.value).replace(/\D/g,"");
 
-for(const w of words){
-if(!w.text||!w.bbox)continue;
+if(raw.length>4)raw=raw.slice(0,4);
 
-let y=(w.bbox.y0+w.bbox.y1)/2;
-let height=w.bbox.y1-w.bbox.y0;
-let group=groups.find(g=>
-Math.abs(g.y-y)<Math.max(12,Math.min(24,g.height*.65))
-);
+if(raw.length===4){
+const hour=Number(raw.slice(0,2));
+const minute=Number(raw.slice(2));
 
-if(!group){
-groups.push({y:y,height:height,words:[w]});
+if(hour<=23&&minute<=59){
+input.value=formatInputTime(hour*60+minute);
 }else{
-group.words.push(w);
-group.y=group.words.reduce((s,a)=>s+(a.bbox.y0+a.bbox.y1)/2,0)/group.words.length;
-group.height=Math.max(group.height,height);
+input.value=raw;
 }
-}
-
-return groups.sort((a,b)=>a.y-b.y);
-}
-
-function timesInLine(words){
-let line=[...words].sort((a,b)=>a.bbox.x0-b.bbox.x0);
-let found=[];
-
-for(const w of line){
-for(const t of extractTimes(w.text)){
-found.push({time:t,x:w.bbox.x0});
-}
-}
-
-// اگر OCR ساعت و دقیقه را جدا خوانده باشد، آن‌ها را به هم وصل می‌کنیم.
-for(let i=0;i<line.length-1;i++){
-let a=line[i],b=line[i+1];
-let distance=b.bbox.x0-a.bbox.x1;
-
-if(distance>=0&&distance<45){
-let joined=normalize(a.text)+':'+normalize(b.text);
-for(const t of extractTimes(joined)){
-found.push({time:t,x:(a.bbox.x0+b.bbox.x0)/2});
-}
-}
-}
-
-let unique=[];
-found.forEach(t=>{
-if(!unique.some(x=>x.time===t.time&&Math.abs(x.x-t.x)<20)){
-unique.push(t);
-}
-});
-
-// ترتیب زمانی، نه ترتیب چپ و راست ستون‌های جدول
-unique.sort((a,b)=>getMinutes(a.time)-getMinutes(b.time));
-return unique.map(x=>x.time);
-}
-
-async function prepareImage(file){
-const bitmap=await createImageBitmap(file);
-const scale=Math.min(2.5,2200/bitmap.width);
-
-const canvas=document.createElement('canvas');
-canvas.width=Math.round(bitmap.width*scale);
-canvas.height=Math.round(bitmap.height*scale);
-
-const ctx=canvas.getContext('2d',{willReadFrequently:true});
-ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
-
-const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-
-for(let i=0;i<img.data.length;i+=4){
-let gray=.299*img.data[i]+.587*img.data[i+1]+.114*img.data[i+2];
-let v=Math.max(0,Math.min(255,(gray-128)*1.4+128));
-img.data[i]=v;
-img.data[i+1]=v;
-img.data[i+2]=v;
-}
-
-ctx.putImageData(img,0,0);
-return canvas;
-}
-
-async function readPhoto(){
-const file=document.getElementById('photo').files[0];
-const status=document.getElementById('status');
-const btn=document.getElementById('readBtn');
-
-if(!file){
-status.textContent='ابتدا عکس را انتخاب کن.';
-return;
-}
-
-if(!window.Tesseract){
-status.textContent='ابزار تشخیص عکس بارگذاری نشده است. اینترنت را بررسی کن.';
-return;
-}
-
-btn.disabled=true;
-status.textContent='در حال آماده‌سازی عکس...';
-
-let worker=null;
-
-try{
-const image=await prepareImage(file);
-
-worker=await Tesseract.createWorker('fas+eng',1,{
-logger:m=>{
-if(m.status==='recognizing text'){
-status.textContent='در حال خواندن عکس: '+Math.round((m.progress||0)*100)+'٪';
-}
-}
-});
-
-const result=await worker.recognize(image);
-const words=result.data.words||[];
-const groups=groupWords(words);
-
-let records=[];
-
-for(const group of groups){
-let times=timesInLine(group.words);
-
-if(times.length>=2){
-records.push({
-entry:times[0],
-exit:times[times.length-1]
-});
-}
-}
-
-if(records.length===0){
-status.textContent='هیچ ردیف دارای دو ساعت شناسایی نشد. لطفاً عکس واضح‌تر انتخاب کن یا ساعت‌ها را دستی وارد کن.';
+}else if(onBlur&&raw.length>0){
+const parsed=parseTime(raw);
+input.value=parsed===null?raw:formatInputTime(parsed);
 }else{
-tbody.innerHTML='';
+input.value=raw;
+}
+}
 
-records.forEach(r=>{
-addRow(r.entry,r.exit);
-});
+tbody.addEventListener("focus",function(event){
+if(event.target.matches("input")){
+event.target.value=toEnglishDigits(event.target.value).replace(/\D/g,"");
+event.target.select();
+}
+},true);
 
+tbody.addEventListener("input",function(event){
+if(!event.target.matches("input"))return;
+normalizeInput(event.target,false);
 calculate();
+});
 
-status.textContent=
-records.length+' ردیف شناسایی شد و به جدول منتقل شد.\n'+
-'لطفاً ساعت‌ها را با عکس اصلی مقایسه کن؛ تشخیص خودکار ممکن است اشتباه داشته باشد.';
-}
+tbody.addEventListener("blur",function(event){
+if(!event.target.matches("input"))return;
+normalizeInput(event.target,true);
+calculate();
+},true);
 
-}catch(error){
-console.error(error);
-status.textContent='خطا در خواندن عکس. اینترنت را بررسی کن و دوباره تلاش کن.';
-}finally{
-if(worker){
-await worker.terminate();
-}
-btn.disabled=false;
-}
-}
+document.getElementById("addButton").addEventListener("click",function(){
+addRows(10);
+});
 
-addRow();
+document.getElementById("clearButton").addEventListener("click",function(){
+if(!confirm("همه ساعت‌های واردشده پاک شوند؟"))return;
+tbody.innerHTML="";
+addRows(50);
+calculate();
+});
+
+addRows(50);
+calculate();
 </script>
 </body>
 </html>
