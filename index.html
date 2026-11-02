@@ -37,8 +37,9 @@ button{border:0;border-radius:7px;padding:11px 14px;font-size:14px;cursor:pointe
 <br>۱۳۴۴ ← ۱۳:۴۴
 <br>۱۴۰۵ ← ۱۴:۰۵
 <br>۷۳۰ ← ۰۷:۳۰
+<br>۱۴۴۴ ← ۱۴:۴۴
 <br>اگر فقط ۱۳ وارد کنی، بعد از خروج از کادر به ۱۳:۰۰ تبدیل می‌شود.
-<br>کارکرد قبل از ساعت ۱۳ محاسبه نمی‌شود.
+<br>محاسبه کامل از ساعت ورود تا ساعت خروج انجام می‌شود.
 </div>
 
 <div class="total">
@@ -139,7 +140,7 @@ for(let i=0;i<count;i++){
 const row=document.createElement("tr");
 row.innerHTML=`
 <td>${toPersianDigits(currentCount+i+1)}</td>
-<td><input type="text" class="entry" inputmode="numeric" maxlength="5" placeholder="مثلاً ۱۳۰۰" aria-label="ساعت ورود"></td>
+<td><input type="text" class="entry" inputmode="numeric" maxlength="5" placeholder="مثلاً ۰۸۳۰" aria-label="ساعت ورود"></td>
 <td><input type="text" class="exit" inputmode="numeric" maxlength="5" placeholder="مثلاً ۱۷۰۰" aria-label="ساعت خروج"></td>
 <td class="duration">—</td>
 `;
@@ -163,8 +164,7 @@ result.textContent="—";
 return;
 }
 
-const start=Math.max(entry,13*60);
-const duration=Math.max(0,exit-start);
+const duration=exit-entry;
 
 result.textContent=formatDuration(duration);
 total+=duration;
